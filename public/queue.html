@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Random Chat - Queue</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.socket.io/4.0.0/socket.io.min.js"></script>
+</head>
+<body class="bg-white text-gray-900 font-sans">
+
+  <nav class="bg-green-600 p-4 shadow-lg">
+    <div class="container mx-auto flex justify-between items-center">
+      <h1 class="text-white text-3xl font-semibold">Random Chat</h1>
+    </div>
+  </nav>
+
+  <section class="flex items-center justify-center min-h-screen">
+    <div class="text-center p-8 bg-green-100 rounded-lg shadow-lg max-w-lg w-full">
+      <h2 class="text-3xl font-semibold text-green-600">Waiting for a Match...</h2>
+      <p class="text-lg text-gray-700 mt-4">Please wait while we find someone for you to chat with.</p>
+      <div id="status" class="mt-4 text-lg text-gray-600">Queueing...</div>
+      <div class="mt-8">
+        <button id="cancelButton" class="py-3 px-6 bg-red-600 text-white rounded-lg hover:bg-red-700 transition duration-300 text-lg">Cancel Queue</button>
+      </div>
+    </div>
+  </section>
+
+  <script>
+    const socket = io('http://localhost:3000');
+
+    const statusElement = document.getElementById('status');
+    const cancelButton = document.getElementById('cancelButton');
+
+    socket.emit('join-queue');
+
+    socket.on('match-found', () => {
+      window.location.href = '/chat.html';
+    });
+
+    socket.on('queue-error', (message) => {
+      statusElement.textContent = message;
+      cancelButton.textContent = 'Try Again';
+      cancelButton.classList.add('bg-green-600');
+    });
+
+    cancelButton.addEventListener('click', () => {
+      socket.emit('leave-queue');
+      window.location.href = '/queue.html';
+    });
+  </script>
+
+</body>
+</html>
